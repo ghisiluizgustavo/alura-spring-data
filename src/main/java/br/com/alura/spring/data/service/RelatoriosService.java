@@ -5,6 +5,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 
+import br.com.alura.spring.data.orm.FuncionarioProjection;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import br.com.alura.spring.data.orm.Funcionario;
@@ -28,7 +33,8 @@ public class RelatoriosService {
       System.out.println("0 - Sair");
       System.out.println("1 - Busca funcionario nome");
       System.out.println("2 - Busca funcionario nome, data contratacao e salario maior");
-      System.out.println("1 - Busca funcionario data contratacao");
+      System.out.println("3 - Busca funcionario data contratacao");
+      System.out.println("4 - Busca funcionario pelo salario");
 
       int action = scanner.nextInt();
       
@@ -41,6 +47,9 @@ public class RelatoriosService {
         break;
       case 3:
         this.buscaFuncionarioDataContratacao(scanner);
+        break;
+      case 4:
+        this.buscaFuncionarioSalario(scanner);
         break;
       default:
         system = false;
@@ -82,6 +91,17 @@ public class RelatoriosService {
     List<Funcionario> list = funcionarioRepository.findDataContratacaoMaior(localDateTime);
 
     list.forEach(System.out::println);
+  }
+
+  private void buscaFuncionarioSalario(Scanner scanner){
+    System.out.println("Insira qual a pagina deseja buscar: ");
+    int page = scanner.nextInt();
+
+    Pageable pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC, "salario"));
+
+    Page<FuncionarioProjection> list = funcionarioRepository.findFuncionarioSalario(pageable);
+    list.forEach(f -> System.out.println("Funcionario = Id: " + f.getId() +
+            " | Nome: " + f.getNome() + " | Salario: " + f.getSalario()));
   }
   
 }
